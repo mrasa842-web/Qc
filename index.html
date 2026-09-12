@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام رصيد الإجازات - HS</title>
+    <title>نظام رصيد الإجازات الشامل - HS</title>
     <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -27,9 +27,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-white); min-height: 100vh; padding: 15px; display: flex; justify-content: center; }
 
-        .app-container { width: 100%; max-width: 520px; margin: 0 auto; }
+        .app-container { width: 100%; max-width: 580px; margin: 0 auto; }
 
-        /* HS Logo Card */
         .logo-box {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -41,7 +40,6 @@
             font-weight: 800; font-size: 22px; letter-spacing: 1px; color: #fff;
         }
 
-        /* Glass Cards */
         .card-panel {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -51,7 +49,6 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        /* Header Info */
         .emp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .emp-avatar {
             width: 42px; height: 42px; background: #00b4d8; border-radius: 50%;
@@ -64,7 +61,6 @@
             display: inline-flex; align-items: center; gap: 6px;
         }
 
-        /* Grid for Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .stat-item {
             background: var(--card-inner); border: 1px solid var(--border-color);
@@ -74,13 +70,11 @@
         .stat-item .val { font-size: 16px; font-weight: 800; }
         .stat-item .unit { font-size: 9px; color: var(--text-dim); }
 
-        /* Progress Bar */
         .progress-section { margin-bottom: 5px; }
         .progress-title { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
         .progress-bar-bg { background: #132235; height: 8px; border-radius: 10px; overflow: hidden; }
         .progress-bar-fill { background: var(--accent-green); height: 100%; width: 0%; border-radius: 10px; transition: width 0.3s; }
 
-        /* Inputs & Form */
         .form-control-custom, .form-select-custom {
             width: 100%; background: var(--card-inner); border: 1px solid var(--border-color);
             color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 10px; outline: none;
@@ -88,12 +82,11 @@
         .form-row { display: flex; gap: 8px; }
 
         .btn-submit {
-            background: var(--primary-blue); color: white; border: none; padding: 12px;
-            border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;
+            background: var(--primary-blue); color: white; border: none; padding: 10px;
+            border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 13px;
             box-shadow: 0 4px 12px rgba(0,132,255,0.3); display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
-        /* Action Buttons */
         .btn-sm-action {
             padding: 4px 8px; border-radius: 6px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; color: #fff; margin: 2px;
         }
@@ -101,23 +94,22 @@
         .btn-reject { background: var(--accent-red); }
         .btn-edit { background: var(--accent-orange); }
 
-        /* Employee Details Card in Admin */
-        .emp-admin-card {
+        .emp-admin-box {
             background: var(--card-inner);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
-            margin-bottom: 12px;
-        }
-        .emp-admin-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;
+            margin-bottom: 14px;
         }
 
-        /* Table */
+        .emp-admin-head {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px;
+        }
+
         table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
         th { color: var(--text-dim); padding: 8px; border-bottom: 1px solid var(--border-color); font-weight: 600; }
-        td { padding: 10px 4px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        td { padding: 8px 4px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
 
         .screen { display: none; }
         .screen.active { display: block; }
@@ -220,17 +212,22 @@
         </div>
     </div>
 
-    <!-- 3. شاشة لوحة الإدارة التفصيلية الشاملة -->
+    <!-- 3. شاشة لوحة الإدارة الكاملة وبكافة السلطات -->
     <div id="adminScreen" class="screen">
         <div class="logo-box">HS</div>
         
-        <!-- الهيدر والخروج -->
         <div class="card-panel" style="display:flex; justify-content:space-between; align-items:center;">
-            <h4 style="font-size: 14px;">لوحة الإدارة 🔒</h4>
+            <h4 style="font-size: 14px;">لوحة الإدارة الفائقة 🔒</h4>
             <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
         </div>
 
-        <!-- 1. طلبات الإجازات المرفوعة -->
+        <!-- أدوات السلطة والتحكم السريع -->
+        <div class="card-panel" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <button class="btn-submit" style="background:#20bf6b;" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
+            <button class="btn-submit" style="background:#eb3b5a;" onclick="resetAllBalances()"><i class="fa-solid fa-arrows-rotate"></i> تجديد الرصيد السنوي</button>
+        </div>
+
+        <!-- 1. طلبات الإجازات المعلقة -->
         <div class="card-panel">
             <h5 style="margin-bottom:10px; font-size:13px; color:var(--accent-orange);">📩 طلبات الإجازات المعلقة</h5>
             <table>
@@ -239,7 +236,7 @@
                         <th>الموظف</th>
                         <th>النوع</th>
                         <th>الأيام</th>
-                        <th>إجراء</th>
+                        <th>إجراء الإدارة</th>
                     </tr>
                 </thead>
                 <tbody id="adminRequestsTable"></tbody>
@@ -261,12 +258,10 @@
             <button class="btn-submit" onclick="addNewEmployee()"><i class="fa-solid fa-user-plus"></i> حفظ الموظف</button>
         </div>
 
-        <!-- 3. تفاصيل أرصدة الموظفين وإدارتهم بالكامل -->
+        <!-- 3. تفاصيل أرصدة الموظفين + تعديل/تراجعات/خصم مباشر -->
         <div class="card-panel">
-            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">📊 تفاصيل أرصدة الموظفين التفصيلية</h5>
-            <div id="adminEmpCardsContainer">
-                <!-- يتم توليد كروت تفاصيل الموظفين تلقائياً هنا -->
-            </div>
+            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">👥 إدارة وتفاصيل الموظفين والتحكم بالسجلات</h5>
+            <div id="adminDetailedList"></div>
         </div>
 
     </div>
@@ -274,13 +269,12 @@
 </div>
 
 <script>
-    // البيانات الافتراضية والحفظ التلقائي في LocalStorage
-    let employees = JSON.parse(localStorage.getItem('emps_hs_v3')) || [
+    let employees = JSON.parse(localStorage.getItem('emps_hs_ultra')) || [
         {
             code: '1339', password: '1234', name: 'محمد سعد محمد',
             annualTotal: 27, casualTotal: 6,
             usedA: 10, usedC: 0, usedS: 0,
-            history: [ { datetime: '2026-09-10 10:30 ص', type: 'اعتيادي', days: 10, notes: 'خصم أولي' } ],
+            history: [ { id: 101, datetime: '2026-09-10 10:30 ص', type: 'اعتيادي', days: 10, notes: 'خصم أولي' } ],
             requests: []
         }
     ];
@@ -288,9 +282,8 @@
     let currentEmp = null;
     let chartInstance = null;
 
-    // الحفظ التلقائي
     function saveData() { 
-        localStorage.setItem('emps_hs_v3', JSON.stringify(employees)); 
+        localStorage.setItem('emps_hs_ultra', JSON.stringify(employees)); 
     }
 
     function showScreen(id) {
@@ -298,7 +291,6 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // التاريخ والوقت المفصل
     function getCurrentDateTime() {
         let now = new Date();
         let dateStr = now.toISOString().split('T')[0];
@@ -306,14 +298,12 @@
         return `${dateStr} ${timeStr}`;
     }
 
-    // حساب الرصيد المتبقي الإجمالي
     function getRemainingBalance(emp) {
         let grandTotal = (emp.annualTotal || 0) + (emp.casualTotal || 0);
         let usedTotal = (emp.usedA || 0) + (emp.usedC || 0) + (emp.usedS || 0);
         return grandTotal - usedTotal;
     }
 
-    // تسجيل دخول الموظف
     function loginEmployee() {
         let c = document.getElementById('loginCode').value.trim();
         let p = document.getElementById('loginPass').value.trim();
@@ -325,7 +315,6 @@
         showScreen('employeeScreen');
     }
 
-    // تحميل واجهة الموظف
     function loadEmployeeView() {
         document.getElementById('dispName').innerText = currentEmp.name;
         document.getElementById('dispCode').innerText = currentEmp.code;
@@ -359,14 +348,12 @@
         let ctx = document.getElementById('monthlyChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
 
-        let monthlyData = [0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0];
-
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
                 datasets: [{
-                    data: monthlyData,
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0],
                     backgroundColor: '#00d26a',
                     borderRadius: 4
                 }]
@@ -383,17 +370,13 @@
         });
     }
 
-    // تقديم طلب إجازة بواسطة الموظف
     function submitVacationRequest() {
         let type = document.getElementById('reqType').value;
         let days = parseInt(document.getElementById('reqDays').value || 0);
         let reason = document.getElementById('reqReason').value;
 
         if (days <= 0) return alert('الرجاء إدخال عدد أيام صحيح');
-
         let rem = getRemainingBalance(currentEmp);
-
-        // منع الرصيد السالب
         if (days > rem) return alert(`خطأ: رصيدك المتبقي (${rem} يوم) لا يكفي لطلب ${days} أيام!`);
 
         currentEmp.requests.unshift({
@@ -410,7 +393,6 @@
         document.getElementById('reqReason').value = '';
     }
 
-    // تسجيل دخول الإدارة
     function adminLoginPrompt() {
         let pass = prompt('كلمة السر للإدارة:');
         if (pass === '1234') {
@@ -419,9 +401,8 @@
         } else if(pass !== null) alert('كلمة السر غير صحيحة');
     }
 
-    // تحميل لوحة الإدارة بالكامل مع التفاصيل الواضحة لكل إجازة
     function loadAdminView() {
-        // 1. جدول الطلبات المرفوعة المعلقة
+        // 1. الطلبات المرفوعة
         let reqBody = document.getElementById('adminRequestsTable');
         reqBody.innerHTML = '';
         let hasReqs = false;
@@ -445,9 +426,9 @@
 
         if(!hasReqs) reqBody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim);">لا توجد طلبات معلقة حالياً</td></tr>';
 
-        // 2. كروت الموظفين التفصيلية (الأرصدة، المستهلك، المتبقي)
-        let cardsContainer = document.getElementById('adminEmpCardsContainer');
-        cardsContainer.innerHTML = '';
+        // 2. كروت الموظفين والسلطات التفصيلية
+        let listContainer = document.getElementById('adminDetailedList');
+        listContainer.innerHTML = '';
 
         employees.forEach(emp => {
             let annTot = emp.annualTotal || 0;
@@ -460,59 +441,125 @@
 
             let totalRem = annRem + casRem - (emp.usedS || 0);
 
-            cardsContainer.innerHTML += `
-                <div class="emp-admin-card">
-                    <div class="emp-admin-header">
+            // بناء جدول التاريخ والتراجعات
+            let historyHTML = '';
+            if(emp.history.length > 0) {
+                emp.history.forEach(h => {
+                    historyHTML += `
+                        <tr>
+                            <td>${h.datetime}</td>
+                            <td>${h.type}</td>
+                            <td>${h.days}</td>
+                            <td><button style="background:none; border:none; color:var(--accent-red); cursor:pointer;" onclick="cancelVacation('${emp.code}', ${h.id})">🗑️ إلغاء</button></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                historyHTML = '<tr><td colspan="4" style="color:var(--text-dim);">لا يوجد سجل إجازات حتى الآن</td></tr>';
+            }
+
+            listContainer.innerHTML += `
+                <div class="emp-admin-box">
+                    <div class="emp-admin-head">
                         <div>
-                            <strong style="font-size:13px;">${emp.name}</strong>
-                            <small style="color:var(--text-dim); display:block; font-size:10px;">كود: ${emp.code} | كلمة السر: ${emp.password}</small>
+                            <strong style="font-size:14px; color:#fff;">👤 ${emp.name}</strong>
+                            <div style="font-size:11px; color:var(--text-dim);">كود: <b>${emp.code}</b> | كلمة المرور: <b>${emp.password}</b></div>
                         </div>
                         <div>
-                            <button class="btn-sm-action btn-edit" onclick="editEmployee('${emp.code}')">تعديل/خصم</button>
-                            <button class="btn-sm-action btn-reject" onclick="deleteEmployee('${emp.code}')">حذف</button>
+                            <button class="btn-sm-action btn-edit" onclick="editEmployee('${emp.code}')"><i class="fa-solid fa-pen"></i> تعديل/خصم</button>
+                            <button class="btn-sm-action btn-reject" onclick="deleteEmployee('${emp.code}')"><i class="fa-solid fa-trash"></i> حذف</button>
                         </div>
                     </div>
-                    
+
                     <table>
                         <thead>
-                            <tr>
-                                <th>نوع الإجازة</th>
-                                <th>الكلي</th>
-                                <th>المستهلك</th>
+                            <tr style="background:rgba(255,255,255,0.02);">
+                                <th>النوع</th>
+                                <th>الرصيد الكلي</th>
+                                <th>المستخدم</th>
                                 <th>المتبقي</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>🌴 اعتيادي</td>
-                                <td>${annTot}</td>
-                                <td style="color:var(--accent-orange);">${annUsed}</td>
-                                <td style="color:var(--accent-green); font-weight:bold;">${annRem}</td>
+                                <td><b>🌴 اعتيادي</b></td>
+                                <td>${annTot} يوم</td>
+                                <td style="color:var(--accent-orange); font-weight:bold;">${annUsed} يوم</td>
+                                <td style="color:var(--accent-green); font-weight:bold;">${annRem} يوم</td>
                             </tr>
                             <tr>
-                                <td>⚡ عارضة</td>
-                                <td>${casTot}</td>
-                                <td style="color:var(--accent-orange);">${casUsed}</td>
-                                <td style="color:var(--accent-green); font-weight:bold;">${casRem}</td>
+                                <td><b>⚡ عارضة</b></td>
+                                <td>${casTot} يوم</td>
+                                <td style="color:var(--accent-orange); font-weight:bold;">${casUsed} يوم</td>
+                                <td style="color:var(--accent-green); font-weight:bold;">${casRem} يوم</td>
                             </tr>
                             ${emp.usedS > 0 ? `
                             <tr>
-                                <td>🏥 مرضي</td>
+                                <td><b>🏥 مرضي</b></td>
                                 <td>-</td>
-                                <td style="color:var(--accent-orange);">${emp.usedS}</td>
+                                <td style="color:var(--accent-orange); font-weight:bold;">${emp.usedS} يوم</td>
                                 <td>-</td>
                             </tr>` : ''}
                         </tbody>
                     </table>
-                    <div style="text-align:left; font-size:11px; margin-top:8px; color:var(--text-dim);">
-                        إجمالي المتبقي الكلي: <span style="color:var(--accent-green); font-weight:bold;">${totalRem} يوم</span>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; font-size:11px; border-top:1px dashed var(--border-color);">
+                        <span style="color:var(--text-dim);">إجمالي الرصيد المتبقي:</span>
+                        <span style="color:var(--accent-green); font-weight:800; font-size:13px;">${totalRem} يوم</span>
+                    </div>
+
+                    <!-- سلطة تعديل وقرارات سجل الموظف -->
+                    <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:6px; border-radius:8px;">
+                        <small style="color:var(--primary-blue); display:block; margin-bottom:4px; font-weight:bold;">📜 سجل الخصومات وإلغاء الإجازات المخفورة:</small>
+                        <table>
+                            <thead>
+                                <tr><th>التاريخ</th><th>النوع</th><th>الأيام</th><th>إلغاء الخصم</th></tr>
+                            </thead>
+                            <tbody>${historyHTML}</tbody>
+                        </table>
                     </div>
                 </div>
             `;
         });
     }
 
-    // قبول طلب الإجازة
+    // سلطة الإدارة: إلغاء خصم إجازة سابقة وإعادة أيامها لرصيد الموظف
+    function cancelVacation(empCode, historyId) {
+        if(!confirm('هل تريد فعلاً إلغاء خصم هذه الإجازة وإرجاع الأيام لرصيد الموظف؟')) return;
+
+        let emp = employees.find(e => e.code === empCode);
+        let hIndex = emp.history.findIndex(h => h.id === historyId);
+        if(hIndex === -1) return;
+
+        let h = emp.history[hIndex];
+
+        // رد الرصيد للموظف
+        if(h.type === 'اعتيادي') emp.usedA = Math.max(0, (emp.usedA || 0) - h.days);
+        else if(h.type === 'عارضة') emp.usedC = Math.max(0, (emp.usedC || 0) - h.days);
+        else if(h.type === 'مرضي') emp.usedS = Math.max(0, (emp.usedS || 0) - h.days);
+
+        emp.history.splice(hIndex, 1);
+        saveData();
+        loadAdminView();
+        alert('تم إلغاء الإجازة وتحديث رصيد الموظف تلقائياً ✅');
+    }
+
+    // سلطة تجديد كافة الأرصدة دفعة واحدة للسنة الجديدة
+    function resetAllBalances() {
+        if(confirm('هل أنت تأكد من تصفير كافة الإجازات المستهلكة وبدء سنة جديدة لجميع الموظفين؟')) {
+            employees.forEach(emp => {
+                emp.usedA = 0;
+                emp.usedC = 0;
+                emp.usedS = 0;
+                emp.history = [];
+                emp.requests = [];
+            });
+            saveData();
+            loadAdminView();
+            alert('تم تجديد رصيد جميع الموظفين للسنة الجديدة بنجاح 🔄');
+        }
+    }
+
     function approveRequest(empCode, reqId) {
         let emp = employees.find(e => e.code === empCode);
         let reqIndex = emp.requests.findIndex(r => r.id === reqId);
@@ -528,6 +575,7 @@
         else emp.usedS = (emp.usedS || 0) + req.days;
 
         emp.history.unshift({
+            id: Date.now(),
             datetime: req.datetime,
             type: req.type,
             days: req.days,
@@ -535,13 +583,11 @@
         });
 
         emp.requests.splice(reqIndex, 1);
-
         saveData();
         loadAdminView();
         alert('تم قبول الطلب وخصم الرصيد بنجاح ✅');
     }
 
-    // رفض الطلب
     function rejectRequest(empCode, reqId) {
         let emp = employees.find(e => e.code === empCode);
         emp.requests = emp.requests.filter(r => r.id !== reqId);
@@ -550,7 +596,6 @@
         alert('تم رفض الطلب ❌');
     }
 
-    // إضافة موظف جديد
     function addNewEmployee() {
         let name = document.getElementById('addName').value.trim();
         let code = document.getElementById('addCode').value.trim();
@@ -583,7 +628,6 @@
         document.getElementById('addCas').value = '';
     }
 
-    // حذف موظف
     function deleteEmployee(code) {
         if (confirm('هل أنت تأكد من حذف هذا الموظف نهائياً؟')) {
             employees = employees.filter(e => e.code !== code);
@@ -592,13 +636,12 @@
         }
     }
 
-    // تعديل بيانات / خصم إجازة مباشر للموظف
     function editEmployee(code) {
         let emp = employees.find(e => e.code === code);
         let action = prompt(
             `الموظف: ${emp.name}\n` +
             `1: تعديل كلمة السر والرصيد الكلي\n` +
-            `2: خصم إجازة مباشرة\n` +
+            `2: خصم إجازة مباشرة من قبل الإدارة\n` +
             `أدخل الرقم (1 أو 2):`
         );
 
@@ -627,6 +670,7 @@
                 else emp.usedS = (emp.usedS || 0) + days;
 
                 emp.history.unshift({
+                    id: Date.now(),
                     datetime: getCurrentDateTime(),
                     type: type,
                     days: days,
