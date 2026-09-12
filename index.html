@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام رصيد الإجازات</title>
+    <title>نظام رصيد الإجازات - HS</title>
     <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,14 +12,14 @@
 
     <style>
         :root {
-            --bg-dark: #08101a;
-            --card-bg: #101a28;
-            --card-inner: #152234;
-            --border-color: #1e2f47;
+            --bg-dark: #070e17;
+            --card-bg: #0d1724;
+            --card-inner: #132235;
+            --border-color: #1a2d42;
             --primary-blue: #0084ff;
             --accent-green: #00d26a;
             --text-white: #ffffff;
-            --text-dim: #8fa0b5;
+            --text-dim: #7f93aa;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
@@ -29,13 +29,13 @@
 
         /* HS Logo Card */
         .logo-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 70px; height: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 75px; height: 50px;
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 15px;
-            box-shadow: 0 0 15px rgba(0, 132, 255, 0.25);
+            margin: 0 auto 18px;
+            box-shadow: 0 0 20px rgba(0, 132, 255, 0.25);
             font-weight: 800; font-size: 22px; letter-spacing: 1px; color: #fff;
         }
 
@@ -46,19 +46,20 @@
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
         /* Header Info */
         .emp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .emp-avatar {
             width: 42px; height: 42px; background: #00b4d8; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; color: #fff;
         }
 
         .btn-logout {
             background: var(--primary-blue); color: #fff; border: none; padding: 8px;
             border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
         /* Grid for Stats */
@@ -74,7 +75,7 @@
         /* Progress Bar */
         .progress-section { margin-bottom: 5px; }
         .progress-title { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
-        .progress-bar-bg { background: #18283d; height: 8px; border-radius: 10px; overflow: hidden; }
+        .progress-bar-bg { background: #132235; height: 8px; border-radius: 10px; overflow: hidden; }
         .progress-bar-fill { background: var(--accent-green); height: 100%; width: 30%; border-radius: 10px; transition: width 0.3s; }
 
         /* Inputs & Form */
@@ -87,7 +88,7 @@
         .btn-submit {
             background: var(--primary-blue); color: white; border: none; padding: 12px;
             border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,132,255,0.3);
+            box-shadow: 0 4px 12px rgba(0,132,255,0.3); display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
         /* Table */
@@ -119,19 +120,22 @@
     <!-- 2. واجهة الموظف الرئيسية -->
     <div id="employeeScreen" class="screen">
         
-        <!-- اللوجو العلوي HS -->
+        <!-- اللوجو العلوي -->
         <div class="logo-box">HS</div>
 
-        <!-- معلومات الموظف والخروج -->
+        <!-- معلومات الموظف الخروج -->
         <div class="card-panel">
             <div class="emp-header">
-                <span class="badge-tag" style="background: rgba(0, 210, 106, 0.15); color: var(--accent-green); padding: 3px 8px; border-radius: 6px; font-size: 11px;">👁️ عرض شخصي</span>
-                <span style="font-size: 13px; color: var(--text-dim);">بيانات الموظف 👤</span>
+                <button class="btn-logout" style="width: auto; padding: 4px 12px; margin-bottom:0;" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> خروج
+                </button>
+                <div style="text-align: left;">
+                    <div style="font-size: 13px; font-weight: bold;">بيانات الموظف 👤</div>
+                    <span class="badge-tag" style="background: rgba(0, 210, 106, 0.15); color: var(--accent-green); padding: 2px 6px; border-radius: 6px; font-size: 10px;">👁️ عرض شخصي</span>
+                </div>
             </div>
-            
-            <button class="btn-logout" onclick="logout()">خروج 🚪</button>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-inner); padding: 10px 14px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-inner); padding: 10px 14px; border-radius: 12px; margin-top: 10px;">
                 <div>
                     <div style="font-weight: bold; font-size: 14px;" id="dispName">محمد سعد محمد</div>
                     <small style="color: var(--text-dim); font-size: 11px;">الكود: <span id="dispCode">1339</span></small>
@@ -251,7 +255,7 @@
 </div>
 
 <script>
-    let employees = JSON.parse(localStorage.getItem('emps_v4')) || [
+    let employees = JSON.parse(localStorage.getItem('emps_hs_v1')) || [
         {
             code: '1339', password: '1234', name: 'محمد سعد محمد',
             annualTotal: 27, casualTotal: 6,
@@ -264,7 +268,7 @@
     let currentEmp = null;
     let chartInstance = null;
 
-    function save() { localStorage.setItem('emps_v4', JSON.stringify(employees)); }
+    function save() { localStorage.setItem('emps_hs_v1', JSON.stringify(employees)); }
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
