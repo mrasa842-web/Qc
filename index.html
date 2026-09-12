@@ -4,410 +4,556 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام رصيد الإجازات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --bg-main: #060e1a;
-            --panel-bg: rgba(13, 25, 48, 0.85);
-            --panel-border: rgba(0, 132, 255, 0.2);
-            --card-bg: #0b1a30;
-            --primary-blue: #0084ff;
-            --accent-purple: #7c3aed;
+            --bg-dark: #070d18;
+            --card-bg: #0d1726;
+            --card-inner: #111e33;
+            --border-color: #1e2d4a;
+            --accent-blue: #0084ff;
+            --accent-purple: #7928ca;
             --accent-green: #059669;
-            --accent-red: #dc2626;
-            --accent-cyan: #06b6d4;
-            --text-white: #ffffff;
-            --text-dim: #94a3b8;
+            --text-muted: #8a99ad;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background: radial-gradient(circle at top, #0f2744, var(--bg-main)); color: var(--text-white); min-height: 100vh; padding: 15px; }
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Cairo', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-        .screen { display: none; width: 100%; max-width: 1400px; margin: 0 auto; }
-        .screen.active { display: block; }
+        .system-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
 
-        /* Login Box UI */
-        .login-wrapper { max-width: 420px; margin: 80px auto; background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 40px 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); backdrop-filter: blur(15px); }
-        .login-icon { font-size: 60px; color: var(--primary-blue); margin-bottom: 20px; background: rgba(0,132,255,0.1); width: 100px; height: 100px; line-height: 100px; border-radius: 20px; margin: 0 auto 20px; }
-        .input-box { margin-bottom: 15px; position: relative; }
-        .input-box input, select { width: 100%; padding: 14px 18px; background: rgba(5, 12, 24, 0.7); border: 1px solid var(--panel-border); border-radius: 12px; color: #fff; font-size: 15px; text-align: right; outline: none; }
-        .btn-main { background: linear-gradient(90deg, #0084ff, #0052cc); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; font-size: 16px; box-shadow: 0 4px 15px rgba(0,132,255,0.3); }
-        .btn-link { background: transparent; color: var(--primary-blue); border: none; margin-top: 20px; cursor: pointer; text-decoration: underline; font-size: 14px; }
+        .stat-box {
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        /* Layout Structure */
-        .app-layout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; }
-        @media (max-width: 992px) { .app-layout { grid-template-columns: 1fr; } }
+        .stat-box.purple { border-top: 3px solid var(--accent-purple); }
+        .stat-box.green { border-top: 3px solid var(--accent-green); }
+        .stat-box.blue { border-top: 3px solid var(--accent-blue); }
 
-        /* Sidebar UI */
-        .sidebar { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-        .menu-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: var(--text-dim); text-decoration: none; margin-bottom: 10px; cursor: pointer; font-weight: 600; }
-        .menu-btn.active, .menu-btn:hover { background: rgba(0, 132, 255, 0.15); color: var(--primary-blue); border: 1px solid var(--primary-blue); }
+        .stat-icon-bg {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
 
-        /* Content Area UI */
-        .header-bar { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .badge-code { background: rgba(0, 132, 255, 0.2); border: 1px solid var(--primary-blue); padding: 8px 16px; border-radius: 12px; font-weight: bold; color: var(--primary-blue); }
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        .stat-card.purple { border-top: 4px solid var(--accent-purple); }
-        .stat-card.green { border-top: 4px solid var(--accent-green); }
-        .stat-card.blue { border-top: 4px solid var(--primary-blue); }
-        .stat-card .val { font-size: 32px; font-weight: 800; margin: 5px 0; }
-        .stat-icon { font-size: 28px; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .menu-item {
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-        .grid-split { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        @media (max-width: 992px) { .grid-split { grid-template-columns: 1fr; } }
+        .menu-item.active, .menu-item:hover {
+            background: rgba(0, 132, 255, 0.15);
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
 
-        .panel-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-        th { color: var(--text-dim); font-weight: 600; }
-        
-        .badge-status { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
-        .bg-success { background: rgba(5,150,105,0.2); color: #10b981; }
-        .bg-danger { background: rgba(220,38,38,0.2); color: #ef4444; }
+        .table-custom {
+            width: 100%;
+            color: #fff;
+        }
 
-        .btn-sm { padding: 6px 12px; border-radius: 8px; border: none; cursor: pointer; color: white; font-size: 12px; }
-        .btn-edit { background: #f59e0b; }
-        .btn-del { background: #ef4444; }
+        .table-custom th {
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        .table-custom td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        .form-control-dark, .form-select-dark {
+            background-color: var(--card-inner);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .form-control-dark:focus, .form-select-dark:focus {
+            background-color: var(--card-inner);
+            border-color: var(--accent-blue);
+            color: #fff;
+            box-shadow: none;
+        }
+
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-approved { background: rgba(5, 150, 105, 0.2); color: #10b981; }
+        .badge-rejected { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+        .badge-pending { background: rgba(217, 119, 6, 0.2); color: #fbbf24; }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: auto;
+        }
+
+        .chart-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1. شاشة تسجيل الدخول -->
-    <div id="loginScreen" class="screen active">
-        <div class="login-wrapper">
-            <div class="login-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
-            <h2>نظام رصيد الإجازات</h2>
-            <p style="color: var(--text-dim); font-size: 13px; margin: 10px 0 20px;">إدارة الإجازات للموظفين</p>
-            
-            <div class="input-box"><input type="text" id="employeeCodeInput" placeholder="أدخل كود الموظف"></div>
-            <div class="input-box"><input type="password" id="employeePassInput" placeholder="كلمة المرور"></div>
-            <button class="btn-main" onclick="employeeLogin()"><i class="fa-solid fa-arrow-right-to-bracket"></i> عرض الرصيد</button>
-            <br>
-            <button class="btn-link" onclick="showAdminLogin()"><i class="fa-solid fa-user-shield"></i> تسجيل الدخول للإدارة</button>
-        </div>
-    </div>
-
-    <!-- 2. لوحة الموظف -->
-    <div id="employeeDashboard" class="screen">
-        <div class="app-layout">
-            <div class="sidebar">
-                <div>
-                    <div class="menu-btn active"><i class="fa-solid fa-house"></i> الرئيسية</div>
-                    <div class="menu-btn"><i class="fa-solid fa-list-check"></i> تفاصيل الإجازات</div>
-                    <div class="menu-btn"><i class="fa-solid fa-clock-rotate-left"></i> سجل الإجازات</div>
-                </div>
-                <div class="menu-btn" style="color:#ef4444;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</div>
-            </div>
-
-            <div class="main-content">
-                <div class="header-bar">
-                    <div>
-                        <h2 id="empName">مرحباً، الموظف</h2>
-                        <span style="color: var(--text-dim); font-size: 13px;">يمكنك الآن الاطلاع على رصيد إجازاتك</span>
-                    </div>
-                    <div class="badge-code" id="empCodeBadge">كود الموظف: ----</div>
-                </div>
-
-                <div class="cards-grid">
-                    <div class="stat-card purple">
-                        <div>
-                            <div style="color:var(--text-dim);">إجازة مرضية</div>
-                            <div class="val" id="sickRemaining">0</div>
-                            <div style="font-size:12px; color:var(--text-dim);">من <span id="sickTotal">0</span> يوم</div>
-                        </div>
-                        <div class="stat-icon" style="background:rgba(124,58,237,0.2); color:var(--accent-purple);"><i class="fa-solid fa-notes-medical"></i></div>
-                    </div>
-
-                    <div class="stat-card green">
-                        <div>
-                            <div style="color:var(--text-dim);">إجازة عارضة</div>
-                            <div class="val" id="casualRemaining">0</div>
-                            <div style="font-size:12px; color:var(--text-dim);">من <span id="casualTotal">0</span> يوم</div>
-                        </div>
-                        <div class="stat-icon" style="background:rgba(5,150,105,0.2); color:var(--accent-green);"><i class="fa-solid fa-briefcase"></i></div>
-                    </div>
-
-                    <div class="stat-card blue">
-                        <div>
-                            <div style="color:var(--text-dim);">الإجازة الاعتيادية</div>
-                            <div class="val" id="annualRemaining">0</div>
-                            <div style="font-size:12px; color:var(--text-dim);">من <span id="annualTotal">0</span> يوم</div>
-                        </div>
-                        <div class="stat-icon" style="background:rgba(0,132,255,0.2); color:var(--primary-blue);"><i class="fa-solid fa-umbrella-beach"></i></div>
-                    </div>
-                </div>
-
-                <div class="grid-split">
-                    <div class="panel-box">
-                        <h3>تفاصيل رصيد الإجازات</h3>
-                        <table>
-                            <thead>
-                                <tr><th>نوع الإجازة</th><th>الرصيد الكلي</th><th>المستخدم</th><th>المتبقي</th></tr>
-                            </thead>
-                            <tbody id="vacationTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="panel-box" style="text-align: center;">
-                        <h3>إجمالي المتبقي</h3>
-                        <div style="width: 170px; margin: 15px auto;">
-                            <canvas id="vacationChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-box">
-                    <h3>سجل الإجازات الخاص بك</h3>
-                    <table>
-                        <thead>
-                            <tr><th>التاريخ</th><th>نوع الإجازة</th><th>الأيام الخصمة</th></tr>
-                        </thead>
-                        <tbody id="empHistoryTable"></tbody>
-                    </table>
-                </div>
+<div class="container-fluid">
+    
+    <!-- 1. صفحة الدخول البسيطة -->
+    <div id="viewLogin" class="row justify-content-center align-items-center style="min-height: 80vh;">
+        <div class="col-md-4">
+            <div class="system-card text-center p-4">
+                <div class="mb-3 text-primary"><i class="fa-solid fa-umbrella-beach fa-4x"></i></div>
+                <h3 class="fw-bold mb-1">نظام رصيد الإجازات</h3>
+                <p class="text-secondary small mb-4">إدارة الإجازات للموظفين</p>
+                
+                <input id="loginCode" class="form-control form-control-dark text-center mb-2" placeholder="ادخل كود الموظف">
+                <input id="loginPass" type="password" class="form-control form-control-dark text-center mb-3" placeholder="كلمة المرور">
+                
+                <button class="btn btn-primary w-100 fw-bold py-2 mb-2" onclick="loginEmp()"><i class="fa-solid fa-magnifying-glass me-2"></i>عرض الرصيد</button>
+                <button class="btn btn-link text-decoration-none text-secondary small" onclick="loginAdminPrompt()"><i class="fa-solid fa-lock me-1"></i>تسجيل الدخول للإدارة</button>
             </div>
         </div>
     </div>
 
-    <!-- 3. لوحة التحكم للإدارة -->
-    <div id="adminDashboard" class="screen">
-        <div class="app-layout">
-            <div class="sidebar">
-                <div>
-                    <div class="menu-btn active"><i class="fa-solid fa-users"></i> إدارة الموظفين</div>
-                    <div class="menu-btn"><i class="fa-solid fa-file-invoice"></i> السجل العام</div>
+    <!-- 2. لوحة تحكم الموظف الرئيسية (مطابقة للواجهة العليا في الصورة) -->
+    <div id="viewEmployee" class="d-none">
+        <div class="row">
+            <!-- الشريط الجانبي -->
+            <div class="col-lg-2">
+                <div class="system-card h-100 d-flex flex-column justify-content-between">
+                    <div class="sidebar-menu">
+                        <div class="menu-item active"><i class="fa-solid fa-house"></i> الرئيسية</div>
+                        <div class="menu-item"><i class="fa-solid fa-calendar-days"></i> تفاصيل الإجازات</div>
+                        <div class="menu-item"><i class="fa-solid fa-clock"></i> سجل الإجازات</div>
+                        <div class="menu-item"><i class="fa-solid fa-user"></i> بيانات الموظف</div>
+                    </div>
+                    <div class="menu-item text-danger mt-4" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</div>
                 </div>
-                <div class="menu-btn" style="color:#ef4444;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</div>
             </div>
 
-            <div class="main-content">
-                <div class="header-bar">
-                    <h2><i class="fa-solid fa-user-shield"></i> لوحة الإدارة العامة</h2>
+            <!-- المحتوى الرئيسي -->
+            <div class="col-lg-10">
+                <!-- الهيدر العلوي -->
+                <div class="system-card py-3">
+                    <div class="top-header mb-0 border-0 pb-0">
+                        <div><i class="fa-solid fa-calendar-check me-2 text-primary"></i> نظام رصيد الإجازات</div>
+                        <div class="text-secondary small" id="currentDateText">السبت 10 مايو 2025 | 10:24 ص</div>
+                    </div>
                 </div>
 
-                <div class="grid-split">
-                    <!-- الخصم -->
-                    <div class="panel-box">
-                        <h3>خصم إجازة لموظف</h3>
-                        <br>
-                        <div class="input-box"><select id="adminEmpSelect"></select></div>
-                        <div class="input-box">
-                            <select id="adminVacType">
-                                <option value="annual">اعتيادي</option>
-                                <option value="casual">عارضة</option>
-                                <option value="sick">مرضي</option>
-                            </select>
+                <div class="system-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-user fa-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="m-0 fw-bold" id="empNameDisp">مرحباً، محمد سعد محمد</h4>
+                                <small class="text-secondary">يمكنك الآن الاطلاع على رصيد إجازاتك</small>
+                            </div>
                         </div>
-                        <div class="input-box"><input type="number" id="adminDaysNum" placeholder="عدد الأيام"></div>
-                        <button class="btn-main" onclick="applyVacation()">تأكيد خصم الأيام</button>
+                        <div class="bg-dark px-3 py-2 rounded-3 text-center border border-secondary">
+                            <small class="text-secondary d-block">كود الموظف</small>
+                            <span class="fw-bold text-primary" id="empCodeDisp">1339</span>
+                        </div>
                     </div>
 
-                    <!-- إضافة أو تعديل -->
-                    <div class="panel-box">
-                        <h3>إضافة / تعديل بيانات موظف</h3>
-                        <br>
-                        <div class="input-box"><input type="text" id="newEmpCode" placeholder="الكود"></div>
-                        <div class="input-box"><input type="text" id="newEmpName" placeholder="الاسم الكامل"></div>
-                        <div class="input-box"><input type="text" id="newEmpPass" placeholder="كلمة السر"></div>
-                        <button class="btn-main" style="background:var(--accent-green);" onclick="saveEmployee()">حفظ البيانات</button>
+                    <!-- الأرصدة الثلاثة -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="stat-box purple">
+                                <div>
+                                    <small class="text-secondary">إجازة مرضية</small>
+                                    <h2 class="fw-bold my-1" id="sickRem">5</h2>
+                                    <small class="text-secondary">من <span id="sickTot">15</span> يوم</small>
+                                </div>
+                                <div class="stat-icon-bg bg-purple text-white" style="background:#7928ca"><i class="fa-solid fa-plus"></i></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box green">
+                                <div>
+                                    <small class="text-secondary">إجازة عارضة</small>
+                                    <h2 class="fw-bold my-1" id="casualRem">6</h2>
+                                    <small class="text-secondary">من <span id="casualTot">10</span> يوم</small>
+                                </div>
+                                <div class="stat-icon-bg bg-success text-white"><i class="fa-solid fa-briefcase"></i></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box blue">
+                                <div>
+                                    <small class="text-secondary">الإجازة الاعتيادية</small>
+                                    <h2 class="fw-bold my-1" id="annualRem">23</h2>
+                                    <small class="text-secondary">من <span id="annualTot">33</span> يوم</small>
+                                </div>
+                                <div class="stat-icon-bg bg-primary text-white"><i class="fa-solid fa-umbrella-beach"></i></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- جدول الموظفين -->
-                <div class="panel-box">
-                    <h3>قائمة الموظفين والأرصدة الحالية</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>الكود</th>
-                                <th>الاسم</th>
-                                <th>كلمة السر</th>
-                                <th>الاعتيادي المتبقي</th>
-                                <th>العارضة المتبقي</th>
-                                <th>المرضي المتبقي</th>
-                                <th>إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminEmployeesTable"></tbody>
-                    </table>
+                    <!-- التفاصيل والرسم البياني -->
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">تفاصيل رصيد الإجازات</h6>
+                            <table class="table-custom text-center">
+                                <thead>
+                                    <tr>
+                                        <th>نوع الإجازة</th>
+                                        <th>الرصيد الكلي</th>
+                                        <th>المستخدم</th>
+                                        <th>المتبقي</th>
+                                        <th>تاريخ آخر استخدام</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>اعتيادية 🌴</td>
+                                        <td id="tAnnTot">33</td>
+                                        <td id="tAnnUsed">10</td>
+                                        <td id="tAnnRem">23</td>
+                                        <td>2025-04-15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>عارضة 💼</td>
+                                        <td id="tCasTot">10</td>
+                                        <td id="tCasUsed">4</td>
+                                        <td id="tCasRem">6</td>
+                                        <td>2025-05-02</td>
+                                    </tr>
+                                    <tr>
+                                        <td>مرضية ➕</td>
+                                        <td id="tSicTot">15</td>
+                                        <td id="tSicUsed">10</td>
+                                        <td id="tSicRem">5</td>
+                                        <td>2025-03-20</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6 class="fw-bold mb-3">إجمالي المتبقي</h6>
+                            <div class="chart-container">
+                                <canvas id="mainDoughnutChart"></canvas>
+                                <div class="chart-overlay">
+                                    <small class="text-secondary d-block">إجمالي المتبقي</small>
+                                    <h3 class="fw-bold m-0" id="chartTotalRem">34</h3>
+                                    <small class="text-secondary">يوم</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        let employees = JSON.parse(localStorage.getItem('empsData_v2')) || [
-            { code: "1339", password: "1234", name: "محمد سعد محمد", annual: 33, casual: 10, sick: 15, usedA: 10, usedC: 4, usedS: 1, history: [] },
-            { code: "1401", password: "1122", name: "أحمد علي حسن", annual: 30, casual: 10, sick: 15, usedA: 5, usedC: 2, usedS: 0, history: [] }
-        ];
+    <!-- 3. لوحة الإدارة الشاملة (مطابقة للوحة الإدارة السفلية) -->
+    <div id="viewAdmin" class="d-none">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="system-card h-100">
+                    <div class="sidebar-menu">
+                        <div class="menu-item active"><i class="fa-solid fa-users"></i> الموظفين</div>
+                        <div class="menu-item"><i class="fa-solid fa-pen-to-square"></i> تعديل الأرصدة</div>
+                        <div class="menu-item"><i class="fa-solid fa-user-plus"></i> إضافة موظف</div>
+                        <div class="menu-item"><i class="fa-solid fa-file-lines"></i> تقرير الإجازات</div>
+                    </div>
+                    <div class="menu-item text-danger mt-5" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</div>
+                </div>
+            </div>
 
-        let currentChart = null;
+            <div class="col-lg-10">
+                <div class="system-card">
+                    <div class="top-header">
+                        <h5 class="fw-bold m-0"><i class="fa-solid fa-user-shield me-2"></i> لوحة الإدارة</h5>
+                        <button class="btn btn-primary btn-sm" onclick="showAddEmpModal()"><i class="fa-solid fa-plus me-1"></i> إضافة موظف +</button>
+                    </div>
 
-        function save() { localStorage.setItem('empsData_v2', JSON.stringify(employees)); }
+                    <div class="row g-3">
+                        <!-- الجدول المباشر للموظفين -->
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">إدارة الموظفين</h6>
+                            <table class="table-custom text-center">
+                                <thead>
+                                    <tr>
+                                        <th>كود الموظف</th>
+                                        <th>الاسم</th>
+                                        <th>الرصيد الاعتيادي</th>
+                                        <th>الرصيد العارضة</th>
+                                        <th>الرصيد المرضي</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminEmpsTable">
+                                    <!-- يتم تحميل الموظفين تلقائياً -->
+                                </tbody>
+                            </table>
+                        </div>
 
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+                        <!-- إحصائيات خصم الإجازة -->
+                        <div class="col-md-4">
+                            <div class="system-card bg-dark border-0">
+                                <h6 class="fw-bold mb-3">إضافة رصيد / خصم إجازة</h6>
+                                <select id="admSelectEmp" class="form-select form-select-dark mb-2"></select>
+                                <select id="admSelectType" class="form-select form-select-dark mb-2">
+                                    <option value="annual">اعتيادية</option>
+                                    <option value="casual">عارضة</option>
+                                    <option value="sick">مرضية</option>
+                                </select>
+                                <input id="admDaysCount" type="number" class="form-control form-control-dark mb-3" placeholder="عدد الأيام">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="adminDeduct()">حفظ الخصم</button>
+                            </div>
+                        </div>
+                    </div>
 
-        function employeeLogin() {
-            const c = document.getElementById('employeeCodeInput').value.trim();
-            const p = document.getElementById('employeePassInput').value.trim();
-            const emp = employees.find(e => e.code === c && e.password === p);
+                </div>
+            </div>
+        </div>
+    </div>
 
-            if (emp) {
-                loadEmpDashboard(emp);
-                showScreen('employeeDashboard');
-            } else {
-                alert('كود الموظف أو كلمة المرور غير صحيحة');
+</div>
+
+<script>
+    // قاعدة البيانات المبدئية المطابقة للصورة
+    let employees = JSON.parse(localStorage.getItem('empsData_v3')) || [
+        { code: "1339", password: "1234", name: "محمد سعد محمد", annual: 33, casual: 10, sick: 15, usedA: 10, usedC: 4, usedS: 10, history: [] },
+        { code: "1401", password: "1234", name: "أحمد علي حسن", annual: 30, casual: 10, sick: 15, usedA: 5, usedC: 2, usedS: 0, history: [] },
+        { code: "1520", password: "1234", name: "سامح محمد عبد الله", annual: 32, casual: 10, sick: 15, usedA: 12, usedC: 8, usedS: 0, history: [] }
+    ];
+
+    let myChart = null;
+
+    function saveData() { localStorage.setItem('empsData_v3', JSON.stringify(employees)); }
+
+    function showView(viewId) {
+        document.getElementById('viewLogin').classList.add('d-none');
+        document.getElementById('viewEmployee').classList.add('d-none');
+        document.getElementById('viewAdmin').classList.add('d-none');
+        document.getElementById(viewId).classList.remove('d-none');
+    }
+
+    function loginEmp() {
+        let code = document.getElementById('loginCode').value;
+        let pass = document.getElementById('loginPass').value;
+        let emp = employees.find(e => e.code == code && e.password == pass);
+
+        if(!emp) return alert('الكود أو كلمة المرور غير صحيحة');
+
+        renderEmployeeView(emp);
+        showView('viewEmployee');
+    }
+
+    function renderEmployeeView(emp) {
+        document.getElementById('empNameDisp').innerText = emp.name;
+        document.getElementById('empCodeDisp').innerText = emp.code;
+
+        let remA = emp.annual - emp.usedA;
+        let remC = emp.casual - emp.usedC;
+        let remS = emp.sick - emp.usedS;
+
+        document.getElementById('annualRem').innerText = remA;
+        document.getElementById('annualTot').innerText = emp.annual;
+        document.getElementById('casualRem').innerText = remC;
+        document.getElementById('casualTot').innerText = emp.casual;
+        document.getElementById('sickRem').innerText = remS;
+        document.getElementById('sickTot').innerText = emp.sick;
+
+        document.getElementById('tAnnTot').innerText = emp.annual;
+        document.getElementById('tAnnUsed').innerText = emp.usedA;
+        document.getElementById('tAnnRem').innerText = remA;
+
+        document.getElementById('tCasTot').innerText = emp.casual;
+        document.getElementById('tCasUsed').innerText = emp.usedC;
+        document.getElementById('tCasRem').innerText = remC;
+
+        document.getElementById('tSicTot').innerText = emp.sick;
+        document.getElementById('tSicUsed').innerText = emp.usedS;
+        document.getElementById('tSicRem').innerText = remS;
+
+        let totalRem = remA + remC + remS;
+        document.getElementById('chartTotalRem').innerText = totalRem;
+
+        // Chart render
+        let ctx = document.getElementById('mainDoughnutChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['اعتيادية', 'عارضة', 'مرضية'],
+                datasets: [{
+                    data: [remA, remC, remS],
+                    backgroundColor: ['#0084ff', '#059669', '#7928ca'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '80%',
+                plugins: { legend: { display: false } }
             }
+        });
+    }
+
+    function loginAdminPrompt() {
+        let p = prompt('كلمة مرور الإدارة:');
+        if(p === '1234') {
+            renderAdminView();
+            showView('viewAdmin');
+        } else {
+            alert('كلمة المرور غير صحيحة');
         }
+    }
 
-        function loadEmpDashboard(emp) {
-            document.getElementById('empName').innerText = `مرحباً، ${emp.name}`;
-            document.getElementById('empCodeBadge').innerText = `كود الموظف: ${emp.code}`;
+    function renderAdminView() {
+        let tbody = document.getElementById('adminEmpsTable');
+        let select = document.getElementById('admSelectEmp');
+        tbody.innerHTML = ''; select.innerHTML = '';
 
-            const remA = emp.annual - emp.usedA;
-            const remC = emp.casual - emp.usedC;
-            const remS = emp.sick - emp.usedS;
-
-            document.getElementById('annualRemaining').innerText = remA;
-            document.getElementById('annualTotal').innerText = emp.annual;
-            document.getElementById('casualRemaining').innerText = remC;
-            document.getElementById('casualTotal').innerText = emp.casual;
-            document.getElementById('sickRemaining').innerText = remS;
-            document.getElementById('sickTotal').innerText = emp.sick;
-
-            document.getElementById('vacationTableBody').innerHTML = `
-                <tr><td>اعتيادية 🌴</td><td>${emp.annual}</td><td>${emp.usedA}</td><td><span class="badge-status bg-success">${remA}</span></td></tr>
-                <tr><td>عارضة 💼</td><td>${emp.casual}</td><td>${emp.usedC}</td><td><span class="badge-status bg-success">${remC}</span></td></tr>
-                <tr><td>مرضية ➕</td><td>${emp.sick}</td><td>${emp.usedS}</td><td><span class="badge-status bg-success">${remS}</span></td></tr>
-            `;
-
-            // Drawing Chart
-            const ctx = document.getElementById('vacationChart').getContext('2d');
-            if (currentChart) currentChart.destroy();
-            currentChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['اعتيادي', 'عارضة', 'مرضي'],
-                    datasets: [{ data: [remA, remC, remS], backgroundColor: ['#0084ff', '#059669', '#7c3aed'], borderWidth: 0 }]
-                },
-                options: { plugins: { legend: { display: false } }, cutout: '70%' }
-            });
-
-            // History
-            const histBody = document.getElementById('empHistoryTable');
-            histBody.innerHTML = emp.history.length === 0 ? `<tr><td colspan="3">لا يوجد سجل إجازات بعد</td></tr>` : '';
-            emp.history.forEach(h => {
-                histBody.innerHTML += `<tr><td>${h.date}</td><td>${h.type}</td><td><span class="badge-status bg-danger">${h.days} يوم</span></td></tr>`;
-            });
-        }
-
-        function showAdminLogin() {
-            if (prompt('كلمة المرور للإدارة:') === '1234') {
-                loadAdmin();
-                showScreen('adminDashboard');
-            } else alert('كلمة المرور غير صحيحة');
-        }
-
-        function loadAdmin() {
-            const select = document.getElementById('adminEmpSelect');
-            const tbody = document.getElementById('adminEmployeesTable');
-            select.innerHTML = ''; tbody.innerHTML = '';
-
-            employees.forEach(e => {
-                select.innerHTML += `<option value="${e.code}">${e.name} (${e.code})</option>`;
-                tbody.innerHTML += `<tr>
+        employees.forEach(e => {
+            select.innerHTML += `<option value="${e.code}">${e.name}</option>`;
+            tbody.innerHTML += `
+                <tr>
                     <td>${e.code}</td>
                     <td>${e.name}</td>
-                    <td style="color:#f59e0b;">${e.password}</td>
                     <td>${e.annual - e.usedA}</td>
                     <td>${e.casual - e.usedC}</td>
                     <td>${e.sick - e.usedS}</td>
                     <td>
-                        <button class="btn-sm btn-edit" onclick="editEmp('${e.code}')">تعديل</button>
-                        <button class="btn-sm btn-del" onclick="delEmp('${e.code}')">حذف</button>
+                        <button class="btn btn-danger btn-sm" onclick="delEmp('${e.code}')"><i class="fa-solid fa-trash"></i></button>
                     </td>
-                </tr>`;
-            });
+                </tr>
+            `;
+        });
+    }
+
+    function adminDeduct() {
+        let code = document.getElementById('admSelectEmp').value;
+        let type = document.getElementById('admSelectType').value;
+        let days = parseInt(document.getElementById('admDaysCount').value || 0);
+
+        if(days <= 0) return alert('أدخل عدد أيام صحيح');
+
+        let emp = employees.find(e => e.code === code);
+        if(!emp) return;
+
+        if(type === 'annual') {
+            if(days > (emp.annual - emp.usedA)) return alert('الرصيد غير كافٍ');
+            emp.usedA += days;
+        } else if(type === 'casual') {
+            if(days > (emp.casual - emp.usedC)) return alert('الرصيد غير كافٍ');
+            emp.usedC += days;
+        } else if(type === 'sick') {
+            if(days > (emp.sick - emp.usedS)) return alert('الرصيد غير كافٍ');
+            emp.usedS += days;
         }
 
-        function saveEmployee() {
-            const c = document.getElementById('newEmpCode').value.trim();
-            const n = document.getElementById('newEmpName').value.trim();
-            const p = document.getElementById('newEmpPass').value.trim();
+        saveData();
+        renderAdminView();
+        alert('تم خصم الأيام بنجاح');
+        document.getElementById('admDaysCount').value = '';
+    }
 
-            if (!c || !n || !p) return alert('برجاء ملء كافة الحقول بشكل صحيح');
+    function showAddEmpModal() {
+        let code = prompt('أدخل كود الموظف الجديد:');
+        if(!code) return;
+        let name = prompt('أدخل اسم الموظف:');
+        if(!name) return;
 
-            let existing = employees.find(e => e.code === c);
-            if (existing) {
-                existing.name = n; existing.password = p;
-                alert('تم التعديل بنجاح');
-            } else {
-                employees.push({ code: c, password: p, name: n, annual: 30, casual: 10, sick: 15, usedA: 0, usedC: 0, usedS: 0, history: [] });
-                alert('تمت الإضافة بنجاح');
-            }
+        employees.push({
+            code: code,
+            password: '1234',
+            name: name,
+            annual: 30,
+            casual: 10,
+            sick: 15,
+            usedA: 0,
+            usedC: 0,
+            usedS: 0,
+            history: []
+        });
 
-            save(); loadAdmin();
-            document.getElementById('newEmpCode').value = '';
-            document.getElementById('newEmpName').value = '';
-            document.getElementById('newEmpPass').value = '';
+        saveData();
+        renderAdminView();
+    }
+
+    function delEmp(code) {
+        if(confirm('هل أنت تأكد من الحذف؟')) {
+            employees = employees.filter(e => e.code !== code);
+            saveData();
+            renderAdminView();
         }
+    }
 
-        function editEmp(code) {
-            let e = employees.find(x => x.code === code);
-            if (e) {
-                document.getElementById('newEmpCode').value = e.code;
-                document.getElementById('newEmpName').value = e.name;
-                document.getElementById('newEmpPass').value = e.password;
-            }
-        }
+    function logout() { showView('viewLogin'); }
 
-        function delEmp(code) {
-            if (confirm(`تأكيد حذف الموظف رقم ${code}؟`)) {
-                employees = employees.filter(e => e.code !== code);
-                save(); loadAdmin();
-            }
-        }
-
-        function applyVacation() {
-            const c = document.getElementById('adminEmpSelect').value;
-            const type = document.getElementById('adminVacType').value;
-            const d = parseInt(document.getElementById('adminDaysNum').value || 0);
-
-            if (d <= 0) return alert('أدخل عدد أيام صحيح');
-
-            let e = employees.find(x => x.code === c);
-            if (e) {
-                let rem = 0;
-                if (type === 'annual') rem = e.annual - e.usedA;
-                if (type === 'casual') rem = e.casual - e.usedC;
-                if (type === 'sick') rem = e.sick - e.usedS;
-
-                if (d > rem) return alert(`رصيد الموظف غير كافٍ! المتبقي لديه هو ${rem} أيام فقط.`);
-
-                if (type === 'annual') e.usedA += d;
-                if (type === 'casual') e.usedC += d;
-                if (type === 'sick') e.usedS += d;
-
-                let typeText = type === 'annual' ? 'اعتيادي' : (type === 'casual' ? 'عارضة' : 'مرضي');
-                e.history.unshift({ date: new Date().toLocaleDateString('ar-EG'), type: typeText, days: d });
-
-                save(); alert('تم الخصم بنجاح');
-                loadAdmin();
-                document.getElementById('adminDaysNum').value = '';
-            }
-        }
-
-        function logout() { showScreen('loginScreen'); }
-        save();
-    </script>
+    saveData();
+</script>
 </body>
 </html>
