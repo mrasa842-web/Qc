@@ -212,7 +212,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة لوحة الإدارة الكاملة وبكافة السلطات -->
+    <!-- 3. شاشة لوحة الإدارة الشاملة بنسبة الاستخدام -->
     <div id="adminScreen" class="screen">
         <div class="logo-box">HS</div>
         
@@ -221,7 +221,6 @@
             <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
         </div>
 
-        <!-- أدوات السلطة والتحكم السريع -->
         <div class="card-panel" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
             <button class="btn-submit" style="background:#20bf6b;" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
             <button class="btn-submit" style="background:#eb3b5a;" onclick="resetAllBalances()"><i class="fa-solid fa-arrows-rotate"></i> تجديد الرصيد السنوي</button>
@@ -258,9 +257,9 @@
             <button class="btn-submit" onclick="addNewEmployee()"><i class="fa-solid fa-user-plus"></i> حفظ الموظف</button>
         </div>
 
-        <!-- 3. تفاصيل أرصدة الموظفين + تعديل/تراجعات/خصم مباشر -->
+        <!-- 3. تفاصيل أرصدة الموظفين + نسب الاستخدام -->
         <div class="card-panel">
-            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">👥 إدارة وتفاصيل الموظفين والتحكم بالسجلات</h5>
+            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">👥 تفاصيل أرصدة الموظفين ونسب الاستخدام</h5>
             <div id="adminDetailedList"></div>
         </div>
 
@@ -269,7 +268,7 @@
 </div>
 
 <script>
-    let employees = JSON.parse(localStorage.getItem('emps_hs_ultra')) || [
+    let employees = JSON.parse(localStorage.getItem('emps_hs_ultra_v2')) || [
         {
             code: '1339', password: '1234', name: 'محمد سعد محمد',
             annualTotal: 27, casualTotal: 6,
@@ -283,7 +282,7 @@
     let chartInstance = null;
 
     function saveData() { 
-        localStorage.setItem('emps_hs_ultra', JSON.stringify(employees)); 
+        localStorage.setItem('emps_hs_ultra_v2', JSON.stringify(employees)); 
     }
 
     function showScreen(id) {
@@ -402,7 +401,7 @@
     }
 
     function loadAdminView() {
-        // 1. الطلبات المرفوعة
+        // 1. الطلبات المعلقة
         let reqBody = document.getElementById('adminRequestsTable');
         reqBody.innerHTML = '';
         let hasReqs = false;
@@ -426,7 +425,7 @@
 
         if(!hasReqs) reqBody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim);">لا توجد طلبات معلقة حالياً</td></tr>';
 
-        // 2. كروت الموظفين والسلطات التفصيلية
+        // 2. كروت الموظفين مع شريط ونسبة الاستخدام
         let listContainer = document.getElementById('adminDetailedList');
         listContainer.innerHTML = '';
 
@@ -439,9 +438,20 @@
             let casUsed = emp.usedC || 0;
             let casRem = casTot - casUsed;
 
+            let totalGrand = annTot + casTot;
+            let totalUsed = annUsed + casUsed + (emp.usedS || 0);
             let totalRem = annRem + casRem - (emp.usedS || 0);
 
-            // بناء جدول التاريخ والتراجعات
+            // حساب نسبة استخدام الرصيد
+            let usagePct = totalGrand > 0 ? Math.round((totalUsed / totalGrand) * 100) : 0;
+            if(usagePct > 100) usagePct = 100;
+
+            // تحديد لون شريط النسبة
+            let pctColor = 'var(--accent-green)';
+            if(usagePct > 70) pctColor = 'var(--accent-orange)';
+            if(usagePct > 90) pctColor = 'var(--accent-red)';
+
+            // بناء جدول التاريخ
             let historyHTML = '';
             if(emp.history.length > 0) {
                 emp.history.forEach(h => {
@@ -468,6 +478,17 @@
                         <div>
                             <button class="btn-sm-action btn-edit" onclick="editEmployee('${emp.code}')"><i class="fa-solid fa-pen"></i> تعديل/خصم</button>
                             <button class="btn-sm-action btn-reject" onclick="deleteEmployee('${emp.code}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                        </div>
+                    </div>
+
+                    <!-- نسبة استخدام الرصيد بداخل كارت الإدارة -->
+                    <div style="background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                            <span style="color: var(--text-dim);">📊 نسبة استهلاك الرصيد الإجمالي:</span>
+                            <span style="font-weight: bold; color: ${pctColor};">${usagePct}%</span>
+                        </div>
+                        <div class="progress-bar-bg" style="height: 6px;">
+                            <div class="progress-bar-fill" style="width: ${usagePct}%; background: ${pctColor};"></div>
                         </div>
                     </div>
 
@@ -508,7 +529,6 @@
                         <span style="color:var(--accent-green); font-weight:800; font-size:13px;">${totalRem} يوم</span>
                     </div>
 
-                    <!-- سلطة تعديل وقرارات سجل الموظف -->
                     <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:6px; border-radius:8px;">
                         <small style="color:var(--primary-blue); display:block; margin-bottom:4px; font-weight:bold;">📜 سجل الخصومات وإلغاء الإجازات المخفورة:</small>
                         <table>
@@ -523,7 +543,6 @@
         });
     }
 
-    // سلطة الإدارة: إلغاء خصم إجازة سابقة وإعادة أيامها لرصيد الموظف
     function cancelVacation(empCode, historyId) {
         if(!confirm('هل تريد فعلاً إلغاء خصم هذه الإجازة وإرجاع الأيام لرصيد الموظف؟')) return;
 
@@ -533,7 +552,6 @@
 
         let h = emp.history[hIndex];
 
-        // رد الرصيد للموظف
         if(h.type === 'اعتيادي') emp.usedA = Math.max(0, (emp.usedA || 0) - h.days);
         else if(h.type === 'عارضة') emp.usedC = Math.max(0, (emp.usedC || 0) - h.days);
         else if(h.type === 'مرضي') emp.usedS = Math.max(0, (emp.usedS || 0) - h.days);
@@ -541,10 +559,9 @@
         emp.history.splice(hIndex, 1);
         saveData();
         loadAdminView();
-        alert('تم إلغاء الإجازة وتحديث رصيد الموظف تلقائياً ✅');
+        alert('تم إلغاء الإجازة وتحديث رصيد ونسبة الموظف تلقائياً ✅');
     }
 
-    // سلطة تجديد كافة الأرصدة دفعة واحدة للسنة الجديدة
     function resetAllBalances() {
         if(confirm('هل أنت تأكد من تصفير كافة الإجازات المستهلكة وبدء سنة جديدة لجميع الموظفين؟')) {
             employees.forEach(emp => {
