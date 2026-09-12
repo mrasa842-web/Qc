@@ -30,9 +30,9 @@
 
         .login-box { max-width: 400px; margin: 60px auto; background: var(--card-bg); border: 1px solid var(--card-border); padding: 35px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .login-box i.main-icon { font-size: 50px; color: var(--primary-blue); margin-bottom: 15px; }
-        .input-group { margin: 20px 0; position: relative; }
+        .input-group { margin: 15px 0; position: relative; }
         .input-group input, select { width: 100%; padding: 14px 15px; background: rgba(11, 19, 31, 0.8); border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 15px; text-align: center; }
-        .btn { background: var(--primary-blue); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn { background: var(--primary-blue); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
         .btn:hover { background: #0066cc; transform: translateY(-2px); }
         .btn-admin-link { background: transparent; color: var(--primary-blue); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; }
 
@@ -58,7 +58,7 @@
         .stat-info .num { font-size: 28px; font-weight: 800; margin: 5px 0; }
         .stat-info .sub { font-size: 12px; color: var(--text-muted); }
 
-        .table-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; overflow-x: auto; }
+        .table-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; overflow-x: auto; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; text-align: right; }
         th, td { padding: 12px 15px; border-bottom: 1px solid var(--card-border); }
         th { color: var(--text-muted); font-weight: 600; font-size: 14px; }
@@ -74,7 +74,10 @@
             <p style="color: var(--text-muted); font-size: 13px; margin-top: 5px;">إدارة الإجازات للموظفين</p>
             
             <div class="input-group">
-                <input type="text" id="employeeCodeInput" placeholder="أدخل كود الموظف (مثال: 1339)">
+                <input type="text" id="employeeCodeInput" placeholder="كود الموظف (مثال: 1339)">
+            </div>
+            <div class="input-group">
+                <input type="password" id="employeePassInput" placeholder="كلمة السر (افتراضي: 1234)">
             </div>
             <button class="btn" onclick="employeeLogin()">عرض الرصيد <i class="fa-solid fa-magnifying-glass"></i></button>
             <br>
@@ -86,12 +89,12 @@
     <div id="employeeDashboard" class="screen">
         <div class="app-header">
             <div>
-                <h2 id="empName">مرحباً، محمد سعد محمد</h2>
+                <h2 id="empName">مرحباً، الموظف</h2>
                 <span style="color: var(--text-muted); font-size: 13px;">يمكنك الآن الاطلاع على رصيد إجازاتك</span>
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <div class="user-badge" id="empCodeBadge">كود الموظف: 1339</div>
-                <button class="btn" style="background:#ef4444; width:auto; padding:8px 15px;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+                <div class="user-badge" id="empCodeBadge">الكود: ----</div>
+                <button class="btn" style="background:#ef4444; width:auto; padding:8px 15px; margin:0;" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
         </div>
 
@@ -99,8 +102,8 @@
             <div class="stat-card purple">
                 <div class="stat-info">
                     <h4>إجازة مرضية</h4>
-                    <div class="num" id="sickRemaining">5</div>
-                    <div class="sub">من <span id="sickTotal">15</span> يوم</div>
+                    <div class="num" id="sickRemaining">0</div>
+                    <div class="sub">من <span id="sickTotal">0</span> يوم</div>
                 </div>
                 <div class="icon"><i class="fa-solid fa-notes-medical"></i></div>
             </div>
@@ -108,8 +111,8 @@
             <div class="stat-card green">
                 <div class="stat-info">
                     <h4>إجازة عارضة</h4>
-                    <div class="num" id="casualRemaining">6</div>
-                    <div class="sub">من <span id="casualTotal">10</span> يوم</div>
+                    <div class="num" id="casualRemaining">0</div>
+                    <div class="sub">من <span id="casualTotal">0</span> يوم</div>
                 </div>
                 <div class="icon"><i class="fa-solid fa-briefcase"></i></div>
             </div>
@@ -117,8 +120,8 @@
             <div class="stat-card blue">
                 <div class="stat-info">
                     <h4>الإجازة الاعتيادية</h4>
-                    <div class="num" id="annualRemaining">23</div>
-                    <div class="sub">من <span id="annualTotal">33</span> يوم</div>
+                    <div class="num" id="annualRemaining">0</div>
+                    <div class="sub">من <span id="annualTotal">0</span> يوم</div>
                 </div>
                 <div class="icon"><i class="fa-solid fa-umbrella-beach"></i></div>
             </div>
@@ -153,12 +156,13 @@
     <div id="adminDashboard" class="screen">
         <div class="app-header">
             <h2><i class="fa-solid fa-user-shield"></i> لوحة التحكم للإدارة</h2>
-            <button class="btn" style="background:#ef4444; width:auto;" onclick="logout()">تسجيل الخروج</button>
+            <button class="btn" style="background:#ef4444; width:auto; margin:0;" onclick="logout()">تسجيل الخروج</button>
         </div>
 
         <div class="grid-2">
+            <!-- إدخال/خصم إجازة -->
             <div class="table-container">
-                <h3><i class="fa-solid fa-plus-circle"></i> خصم إجازة لموظف</h3>
+                <h3><i class="fa-solid fa-plus-circle"></i> خصم أيام إجازة</h3>
                 <br>
                 <div class="input-group"><select id="adminEmpSelect"></select></div>
                 <div class="input-group">
@@ -172,29 +176,43 @@
                 <button class="btn" onclick="applyVacation()">خصم الأيام من رصيد الموظف</button>
             </div>
 
+            <!-- إضافة موظف جديد -->
             <div class="table-container">
-                <h3>جدول أفراد الموظفين</h3>
+                <h3><i class="fa-solid fa-user-plus"></i> إضافة موظف جديد</h3>
                 <br>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الكود</th>
-                            <th>الاسم</th>
-                            <th>اعتيادي</th>
-                            <th>عارضة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminEmployeesTable"></tbody>
-                </table>
+                <div class="input-group"><input type="text" id="newEmpCode" placeholder="كود الموظف"></div>
+                <div class="input-group"><input type="text" id="newEmpName" placeholder="اسم الموظف"></div>
+                <div class="input-group"><input type="text" id="newEmpPass" placeholder="كلمة السر"></div>
+                <button class="btn" style="background:var(--accent-green);" onclick="addNewEmployee()">حفظ الموظف الجديد</button>
             </div>
+        </div>
+
+        <!-- جدول قائمة الموظفين -->
+        <div class="table-container">
+            <h3>قائمة أفراد الموظفين وكلمات السر</h3>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>الاسم</th>
+                        <th>كلمة السر</th>
+                        <th>الاعتيادي المتبقي</th>
+                        <th>العارضة المتبقي</th>
+                        <th>المرضي المتبقي</th>
+                    </tr>
+                </thead>
+                <tbody id="adminEmployeesTable"></tbody>
+            </table>
         </div>
     </div>
 
     <script>
+        // مصفوفة الموظفين وبها كلمات السر
         let employees = JSON.parse(localStorage.getItem('employeesData')) || [
-            { code: "1339", name: "محمد سعد محمد", annualTotal: 33, annualUsed: 10, casualTotal: 10, casualUsed: 4, sickTotal: 15, sickUsed: 10 },
-            { code: "1401", name: "أحمد علي حسن", annualTotal: 30, annualUsed: 5, casualTotal: 10, casualUsed: 2, sickTotal: 15, sickUsed: 0 },
-            { code: "1520", name: "سامح محمد عبد الله", annualTotal: 32, annualUsed: 8, casualTotal: 12, casualUsed: 3, sickTotal: 15, sickUsed: 1 }
+            { code: "1339", password: "1234", name: "محمد سعد محمد", annualTotal: 33, annualUsed: 10, casualTotal: 10, casualUsed: 4, sickTotal: 15, sickUsed: 10 },
+            { code: "1401", password: "1122", name: "أحمد علي حسن", annualTotal: 30, annualUsed: 5, casualTotal: 10, casualUsed: 2, sickTotal: 15, sickUsed: 0 },
+            { code: "1520", password: "3344", name: "سامح محمد عبد الله", annualTotal: 32, annualUsed: 8, casualTotal: 12, casualUsed: 3, sickTotal: 15, sickUsed: 1 }
         ];
 
         let currentChart = null;
@@ -206,20 +224,24 @@
             document.getElementById(screenId).classList.add('active');
         }
 
+        // تسجيل الدخول بالكود + كلمة السر
         function employeeLogin() {
             const code = document.getElementById('employeeCodeInput').value.trim();
-            const emp = employees.find(e => e.code === code);
+            const pass = document.getElementById('employeePassInput').value.trim();
+
+            const emp = employees.find(e => e.code === code && e.password === pass);
+
             if (emp) {
                 loadEmployeeDashboard(emp);
                 showScreen('employeeDashboard');
             } else {
-                alert('كود الموظف غير صحيح! (جرب الكود: 1339)');
+                alert('كود الموظف أو كلمة السر غير صحيحة!');
             }
         }
 
         function loadEmployeeDashboard(emp) {
             document.getElementById('empName').innerText = `مرحباً، ${emp.name}`;
-            document.getElementById('empCodeBadge').innerText = `كود الموظف: ${emp.code}`;
+            document.getElementById('empCodeBadge').innerText = `الكود: ${emp.code}`;
 
             const annualRem = emp.annualTotal - emp.annualUsed;
             const casualRem = emp.casualTotal - emp.casualUsed;
@@ -262,8 +284,36 @@
             select.innerHTML = ''; tbody.innerHTML = '';
             employees.forEach(e => {
                 select.innerHTML += `<option value="${e.code}">${e.name} (${e.code})</option>`;
-                tbody.innerHTML += `<tr><td>${e.code}</td><td>${e.name}</td><td>${e.annualTotal - e.annualUsed} يوم</td><td>${e.casualTotal - e.casualUsed} يوم</td></tr>`;
+                tbody.innerHTML += `<tr>
+                    <td>${e.code}</td>
+                    <td>${e.name}</td>
+                    <td style="color:var(--accent-orange);">${e.password}</td>
+                    <td>${e.annualTotal - e.annualUsed} يوم</td>
+                    <td>${e.casualTotal - e.casualUsed} يوم</td>
+                    <td>${e.sickTotal - e.sickUsed} يوم</td>
+                </tr>`;
             });
+        }
+
+        function addNewEmployee() {
+            const code = document.getElementById('newEmpCode').value.trim();
+            const name = document.getElementById('newEmpName').value.trim();
+            const pass = document.getElementById('newEmpPass').value.trim();
+
+            if (!code || !name || !pass) { alert('برجاء ملء كافة البيانات'); return; }
+
+            employees.push({
+                code: code,
+                password: pass,
+                name: name,
+                annualTotal: 30, annualUsed: 0,
+                casualTotal: 10, casualUsed: 0,
+                sickTotal: 15, sickUsed: 0
+            });
+
+            saveToStorage();
+            alert(`تم إضافة الموظف ${name} بنجاح!`);
+            loadAdminDashboard();
         }
 
         function applyVacation() {
