@@ -27,7 +27,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-white); min-height: 100vh; padding: 15px; display: flex; justify-content: center; }
 
-        .app-container { width: 100%; max-width: 480px; margin: 0 auto; }
+        .app-container { width: 100%; max-width: 520px; margin: 0 auto; }
 
         /* HS Logo Card */
         .logo-box {
@@ -100,6 +100,19 @@
         .btn-accept { background: var(--accent-green); }
         .btn-reject { background: var(--accent-red); }
         .btn-edit { background: var(--accent-orange); }
+
+        /* Employee Details Card in Admin */
+        .emp-admin-card {
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .emp-admin-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;
+        }
 
         /* Table */
         table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
@@ -207,7 +220,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة لوحة الإدارة المتكاملة -->
+    <!-- 3. شاشة لوحة الإدارة التفصيلية الشاملة -->
     <div id="adminScreen" class="screen">
         <div class="logo-box">HS</div>
         
@@ -248,20 +261,12 @@
             <button class="btn-submit" onclick="addNewEmployee()"><i class="fa-solid fa-user-plus"></i> حفظ الموظف</button>
         </div>
 
-        <!-- 3. إدارة وحذف وتعديل الموظفين -->
+        <!-- 3. تفاصيل أرصدة الموظفين وإدارتهم بالكامل -->
         <div class="card-panel">
-            <h5 style="margin-bottom:10px; font-size:13px; color:var(--accent-green);">👥 قائمة الموظفين والأرصدة</h5>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الموظف</th>
-                        <th>الكود</th>
-                        <th>المتبقي</th>
-                        <th>إجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="adminEmpsTable"></tbody>
-            </table>
+            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">📊 تفاصيل أرصدة الموظفين التفصيلية</h5>
+            <div id="adminEmpCardsContainer">
+                <!-- يتم توليد كروت تفاصيل الموظفين تلقائياً هنا -->
+            </div>
         </div>
 
     </div>
@@ -270,7 +275,7 @@
 
 <script>
     // البيانات الافتراضية والحفظ التلقائي في LocalStorage
-    let employees = JSON.parse(localStorage.getItem('emps_hs_v2')) || [
+    let employees = JSON.parse(localStorage.getItem('emps_hs_v3')) || [
         {
             code: '1339', password: '1234', name: 'محمد سعد محمد',
             annualTotal: 27, casualTotal: 6,
@@ -285,7 +290,7 @@
 
     // الحفظ التلقائي
     function saveData() { 
-        localStorage.setItem('emps_hs_v2', JSON.stringify(employees)); 
+        localStorage.setItem('emps_hs_v3', JSON.stringify(employees)); 
     }
 
     function showScreen(id) {
@@ -301,7 +306,7 @@
         return `${dateStr} ${timeStr}`;
     }
 
-    // حساب الرصيد المتبقي
+    // حساب الرصيد المتبقي الإجمالي
     function getRemainingBalance(emp) {
         let grandTotal = (emp.annualTotal || 0) + (emp.casualTotal || 0);
         let usedTotal = (emp.usedA || 0) + (emp.usedC || 0) + (emp.usedS || 0);
@@ -414,7 +419,7 @@
         } else if(pass !== null) alert('كلمة السر غير صحيحة');
     }
 
-    // تحميل لوحة الإدارة
+    // تحميل لوحة الإدارة بالكامل مع التفاصيل الواضحة لكل إجازة
     function loadAdminView() {
         // 1. جدول الطلبات المرفوعة المعلقة
         let reqBody = document.getElementById('adminRequestsTable');
@@ -422,7 +427,7 @@
         let hasReqs = false;
 
         employees.forEach(emp => {
-            emp.requests.forEach((req, idx) => {
+            emp.requests.forEach((req) => {
                 hasReqs = true;
                 reqBody.innerHTML += `
                     <tr>
@@ -440,21 +445,69 @@
 
         if(!hasReqs) reqBody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim);">لا توجد طلبات معلقة حالياً</td></tr>';
 
-        // 2. جدول الموظفين والأرصدة
-        let empBody = document.getElementById('adminEmpsTable');
-        empBody.innerHTML = '';
+        // 2. كروت الموظفين التفصيلية (الأرصدة، المستهلك، المتبقي)
+        let cardsContainer = document.getElementById('adminEmpCardsContainer');
+        cardsContainer.innerHTML = '';
+
         employees.forEach(emp => {
-            let rem = getRemainingBalance(emp);
-            empBody.innerHTML += `
-                <tr>
-                    <td><b>${emp.name}</b></td>
-                    <td>${emp.code}</td>
-                    <td style="color:var(--accent-green); font-weight:bold;">${rem} يوم</td>
-                    <td>
-                        <button class="btn-sm-action btn-edit" onclick="editEmployee('${emp.code}')">تعديل/خصم</button>
-                        <button class="btn-sm-action btn-reject" onclick="deleteEmployee('${emp.code}')">حذف</button>
-                    </td>
-                </tr>
+            let annTot = emp.annualTotal || 0;
+            let annUsed = emp.usedA || 0;
+            let annRem = annTot - annUsed;
+
+            let casTot = emp.casualTotal || 0;
+            let casUsed = emp.usedC || 0;
+            let casRem = casTot - casUsed;
+
+            let totalRem = annRem + casRem - (emp.usedS || 0);
+
+            cardsContainer.innerHTML += `
+                <div class="emp-admin-card">
+                    <div class="emp-admin-header">
+                        <div>
+                            <strong style="font-size:13px;">${emp.name}</strong>
+                            <small style="color:var(--text-dim); display:block; font-size:10px;">كود: ${emp.code} | كلمة السر: ${emp.password}</small>
+                        </div>
+                        <div>
+                            <button class="btn-sm-action btn-edit" onclick="editEmployee('${emp.code}')">تعديل/خصم</button>
+                            <button class="btn-sm-action btn-reject" onclick="deleteEmployee('${emp.code}')">حذف</button>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>نوع الإجازة</th>
+                                <th>الكلي</th>
+                                <th>المستهلك</th>
+                                <th>المتبقي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🌴 اعتيادي</td>
+                                <td>${annTot}</td>
+                                <td style="color:var(--accent-orange);">${annUsed}</td>
+                                <td style="color:var(--accent-green); font-weight:bold;">${annRem}</td>
+                            </tr>
+                            <tr>
+                                <td>⚡ عارضة</td>
+                                <td>${casTot}</td>
+                                <td style="color:var(--accent-orange);">${casUsed}</td>
+                                <td style="color:var(--accent-green); font-weight:bold;">${casRem}</td>
+                            </tr>
+                            ${emp.usedS > 0 ? `
+                            <tr>
+                                <td>🏥 مرضي</td>
+                                <td>-</td>
+                                <td style="color:var(--accent-orange);">${emp.usedS}</td>
+                                <td>-</td>
+                            </tr>` : ''}
+                        </tbody>
+                    </table>
+                    <div style="text-align:left; font-size:11px; margin-top:8px; color:var(--text-dim);">
+                        إجمالي المتبقي الكلي: <span style="color:var(--accent-green); font-weight:bold;">${totalRem} يوم</span>
+                    </div>
+                </div>
             `;
         });
     }
@@ -470,12 +523,10 @@
             return alert(`لا يمكن قبول الطلب: رصيد الموظف المتبقي (${rem}) أقل من الأيام المطلوبة (${req.days}).`);
         }
 
-        // إخصم الرصيد
         if (req.type === 'اعتيادي') emp.usedA = (emp.usedA || 0) + req.days;
         else if (req.type === 'عارضة') emp.usedC = (emp.usedC || 0) + req.days;
         else emp.usedS = (emp.usedS || 0) + req.days;
 
-        // إضافتها بالسجل التفصيلي
         emp.history.unshift({
             datetime: req.datetime,
             type: req.type,
@@ -483,7 +534,6 @@
             notes: req.reason || 'موافقة الإدارة'
         });
 
-        // إزالة من الطلبات المعلقة
         emp.requests.splice(reqIndex, 1);
 
         saveData();
@@ -547,25 +597,30 @@
         let emp = employees.find(e => e.code === code);
         let action = prompt(
             `الموظف: ${emp.name}\n` +
-            `1: تعديل كلمة السر\n` +
+            `1: تعديل كلمة السر والرصيد الكلي\n` +
             `2: خصم إجازة مباشرة\n` +
             `أدخل الرقم (1 أو 2):`
         );
 
         if (action === '1') {
             let newPass = prompt('أدخل كلمة السر الجديدة:', emp.password);
-            if (newPass) {
-                emp.password = newPass;
-                saveData();
-                alert('تم تعديل كلمة السر بنجاح ✅');
-            }
+            let newAnn = prompt('رصيد الاعتيادي الكلي الجديد:', emp.annualTotal);
+            let newCas = prompt('رصيد العارضة الكلي الجديد:', emp.casualTotal);
+
+            if (newPass) emp.password = newPass;
+            if (newAnn !== null) emp.annualTotal = parseInt(newAnn || 0);
+            if (newCas !== null) emp.casualTotal = parseInt(newCas || 0);
+
+            saveData();
+            loadAdminView();
+            alert('تم تعديل بيانات الموظف بنجاح ✅');
         } else if (action === '2') {
             let type = prompt('نوع الإجازة (اعتيادي / عارضة / مرضي):', 'اعتيادي');
             let days = parseInt(prompt('عدد الأيام للخصم:', '1') || 0);
 
             if (days > 0) {
                 let rem = getRemainingBalance(emp);
-                if (days > rem) return alert(`خطأ: لا يمكن الخصم! رصيد الموظف (${rem} يوم) غير كافي.`);
+                if (days > rem) return alert(`خطأ: لا يمكن الخصم! رصيد الموظف المتبقي (${rem} يوم) غير كافي.`);
 
                 if (type === 'اعتيادي') emp.usedA = (emp.usedA || 0) + days;
                 else if (type === 'عارضة') emp.usedC = (emp.usedC || 0) + days;
@@ -580,7 +635,7 @@
 
                 saveData();
                 loadAdminView();
-                alert('تم خصم الإجازة وتسجيلها بالسجل بنجاح ✅');
+                alert('تم خصم الإجازة وتحديث الجدول بنجاح ✅');
             }
         }
     }
