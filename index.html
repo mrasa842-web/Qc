@@ -70,10 +70,37 @@
         .stat-item .val { font-size: 16px; font-weight: 800; }
         .stat-item .unit { font-size: 9px; color: var(--text-dim); }
 
-        .progress-section { margin-bottom: 5px; }
-        .progress-title { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
-        .progress-bar-bg { background: #132235; height: 8px; border-radius: 10px; overflow: hidden; }
-        .progress-bar-fill { background: var(--accent-green); height: 100%; width: 0%; border-radius: 10px; transition: width 0.3s; }
+        /* تصميم شريط النسبة المطابق للصورة بالضبط */
+        .progress-box-exact {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+        .progress-exact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #d1dbe5;
+        }
+        .progress-bar-bg { 
+            background: #09131f; 
+            height: 8px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            position: relative;
+        }
+        .progress-bar-fill { 
+            background: var(--accent-green); 
+            height: 100%; 
+            width: 0%; 
+            border-radius: 10px; 
+            transition: width 0.4s ease-in-out;
+            float: right; /* المحاذاة للغة العربية من اليمين */
+        }
 
         .form-control-custom, .form-select-custom {
             width: 100%; background: var(--card-inner); border: 1px solid var(--border-color);
@@ -162,10 +189,10 @@
                 <div class="stat-item"><small>✅ المتبقي</small><div class="val" style="color: var(--accent-green);" id="statRemaining">0</div><div class="unit">يوم</div></div>
             </div>
 
-            <div class="progress-section">
-                <div class="progress-title">
-                    <span id="progressText">0%</span>
-                    <span>📊 نسبة استخدام الرصيد</span>
+            <div class="progress-box-exact">
+                <div class="progress-exact-header">
+                    <span>نسبة استخدام الرصيد 📊</span>
+                    <span id="progressText" style="font-weight: bold;">0%</span>
                 </div>
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" id="progressBarFill"></div>
@@ -212,7 +239,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة لوحة الإدارة الشاملة بنسبة الاستخدام -->
+    <!-- 3. شاشة لوحة الإدارة (مطابقة للصورة تماماً) -->
     <div id="adminScreen" class="screen">
         <div class="logo-box">HS</div>
         
@@ -257,9 +284,9 @@
             <button class="btn-submit" onclick="addNewEmployee()"><i class="fa-solid fa-user-plus"></i> حفظ الموظف</button>
         </div>
 
-        <!-- 3. تفاصيل أرصدة الموظفين + نسب الاستخدام -->
+        <!-- 3. قائمة الموظفين بالإدارة + النسبة المطابقة للصورة -->
         <div class="card-panel">
-            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">👥 تفاصيل أرصدة الموظفين ونسب الاستخدام</h5>
+            <h5 style="margin-bottom:12px; font-size:13px; color:var(--accent-green);">👥 تفاصيل الموظفين ونسبة استخدام الرصيد</h5>
             <div id="adminDetailedList"></div>
         </div>
 
@@ -268,7 +295,7 @@
 </div>
 
 <script>
-    let employees = JSON.parse(localStorage.getItem('emps_hs_ultra_v2')) || [
+    let employees = JSON.parse(localStorage.getItem('emps_hs_v3')) || [
         {
             code: '1339', password: '1234', name: 'محمد سعد محمد',
             annualTotal: 27, casualTotal: 6,
@@ -282,7 +309,7 @@
     let chartInstance = null;
 
     function saveData() { 
-        localStorage.setItem('emps_hs_ultra_v2', JSON.stringify(employees)); 
+        localStorage.setItem('emps_hs_v3', JSON.stringify(employees)); 
     }
 
     function showScreen(id) {
@@ -425,7 +452,7 @@
 
         if(!hasReqs) reqBody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim);">لا توجد طلبات معلقة حالياً</td></tr>';
 
-        // 2. كروت الموظفين مع شريط ونسبة الاستخدام
+        // 2. كروت الموظفين مع عنصر نسبة الاستخدام المطابق للصورة
         let listContainer = document.getElementById('adminDetailedList');
         listContainer.innerHTML = '';
 
@@ -442,16 +469,11 @@
             let totalUsed = annUsed + casUsed + (emp.usedS || 0);
             let totalRem = annRem + casRem - (emp.usedS || 0);
 
-            // حساب نسبة استخدام الرصيد
+            // حساب النسبة المئوية للاستخدام
             let usagePct = totalGrand > 0 ? Math.round((totalUsed / totalGrand) * 100) : 0;
             if(usagePct > 100) usagePct = 100;
 
-            // تحديد لون شريط النسبة
-            let pctColor = 'var(--accent-green)';
-            if(usagePct > 70) pctColor = 'var(--accent-orange)';
-            if(usagePct > 90) pctColor = 'var(--accent-red)';
-
-            // بناء جدول التاريخ
+            // بناء جدول سجل الخصومات والإلغاء
             let historyHTML = '';
             if(emp.history.length > 0) {
                 emp.history.forEach(h => {
@@ -481,14 +503,14 @@
                         </div>
                     </div>
 
-                    <!-- نسبة استخدام الرصيد بداخل كارت الإدارة -->
-                    <div style="background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
-                            <span style="color: var(--text-dim);">📊 نسبة استهلاك الرصيد الإجمالي:</span>
-                            <span style="font-weight: bold; color: ${pctColor};">${usagePct}%</span>
+                    <!-- نفس تصميم العنصر المرفق في الصورة تماماً -->
+                    <div class="progress-box-exact">
+                        <div class="progress-exact-header">
+                            <span>نسبة استخدام الرصيد 📊</span>
+                            <span style="font-weight: bold; color: #fff;">${usagePct}%</span>
                         </div>
-                        <div class="progress-bar-bg" style="height: 6px;">
-                            <div class="progress-bar-fill" style="width: ${usagePct}%; background: ${pctColor};"></div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${usagePct}%;"></div>
                         </div>
                     </div>
 
@@ -559,7 +581,7 @@
         emp.history.splice(hIndex, 1);
         saveData();
         loadAdminView();
-        alert('تم إلغاء الإجازة وتحديث رصيد ونسبة الموظف تلقائياً ✅');
+        alert('تم إلغاء الإجازة وتحديث النسبة والرصيد تلقائياً ✅');
     }
 
     function resetAllBalances() {
