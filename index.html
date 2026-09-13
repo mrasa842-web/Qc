@@ -392,70 +392,20 @@ body.layout-desktop .tabs{overflow-x:auto}
 <div id="authScreen" class="authScreen">
   <div class="authBox">
     <div class="brandMark" id="brandMarkLogin"></div>
-    <div class="brandTag">AMMAR MOHAMMED</div>
-    <h2>🔐 دخول نظام إدارة الإجازات</h2>
-    <p>اختر طريقة الدخول</p>
-
-    <div class="authSwitch">
-      <button id="employeeLoginTab" class="authTab active" onclick="showLoginMode('employee')">👤 دخول موظف بالكود</button>
-      <button id="adminLoginTab" class="authTab" onclick="showLoginMode('admin')">🔑 دخول الإدارة</button>
-    </div>
-
-    <div id="employeeLoginBox" class="loginMode">
-      <div id="lookupDisabledNotice" class="notice bad hidden">⛔ الاستعلام بالكود متوقف مؤقتًا من قبل الإدارة. برجاء المحاولة لاحقًا.</div>
-      <input id="employeeCode" type="text" inputmode="text" autocomplete="off"
-             placeholder="أدخل كود الموظف"
-             onkeydown="if(event.key==='Enter')loginEmployeeCode()">
-      <button id="employeeLoginBtn" onclick="loginEmployeeCode()">دخول الموظف</button>
-      <div class="muted" style="font-size:12px;margin-top:9px">سيتم عرض بيانات الموظف صاحب هذا الكود فقط.</div>
-    </div>
-
-    <div id="adminLoginBox" class="loginMode hidden">
-      <div id="viewerLoginDisabledNotice" class="notice warn hidden">⚠️ دخول المشاهدين متوقف مؤقتًا. حساب الإدارة الأساسي يعمل بشكل طبيعي.</div>
-      <div class="authFields" style="display:grid;gap:9px">
-        <input id="loginEmail" type="email" autocomplete="username" placeholder="البريد الإلكتروني" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
-        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')login()">
-      </div>
-      <button id="loginBtn" onclick="login()">دخول الإدارة</button>
-    </div>
-    <div id="authErr" class="authErr"></div>
-  </div>
-</div>
-
-<div id="employeeScreen" class="authScreen hidden">
-  <div class="authBox employeeBox">
-    <div class="brandMark" id="brandMarkEmployee" style="width:90px"></div>
-    <div class="employeeHeader" style="margin-bottom:8px">
-      <div class="employeeHeaderInfo"><h2 style="margin:0">👤 بيانات الموظف</h2><span class="pill">👁️ عرض شخصي</span></div>
-      <div class="employeeHeaderActions">
-        <div class="employeeHeaderPersonal" title="بيانات الموظف الشخصية">
-          <div class="miniAvatar" id="headerEmpAvatar">؟</div>
-          <div class="employeeHeaderPersonalText">
-            <b id="headerEmpName">—</b>
-            <span>الكود: <b id="headerEmpCode" style="display:inline;font-size:9px">—</b></span>
-          </div>
+    <div class="brandTag">AMMAR AMMED</div>
+  <!-- 1. شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="screen active">
+        <div class="logo-box">HS</div>
+        <div class="card-panel text-center">
+            <h3 style="margin-bottom: 15px;">تسجيل الدخول</h3>
+            <input type="text" id="loginCode" class="form-control-custom" placeholder="كود الموظف (مثال: 1339)">
+            <input type="password" id="loginPass" class="form-control-custom" placeholder="كلمة المرور">
+            <button class="btn-submit" onclick="loginEmployee()"><i class="fa-solid fa-right-to-bracket"></i> دخول الموظف</button>
+            <br>
+            <button style="background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:12px;" onclick="adminLoginPrompt()">تسجيل الدخول للإدارة 🔒</button>
         </div>
-        <button class="secondary small employeeHeaderLogout" onclick="employeeSignOut()">🚪 خروج</button>
-      </div>
-    </div>
-    <div class="deviceModeBar employeeDeviceModeBar" aria-label="اختيار وضع العرض لصفحة الموظف">
-      <span class="deviceModeLabel">وضع العرض:</span>
-      <button id="employeeModeMobileBtn" class="deviceBtn" data-device-mode="mobile" type="button" onclick="setDeviceMode('mobile')">📱 وضع الموبايل</button>
-      <button id="employeeModeDesktopBtn" class="deviceBtn" data-device-mode="desktop" type="button" onclick="setDeviceMode('desktop')">💻 وضع الكمبيوتر</button>
-      <button id="employeeModeAutoBtn" class="deviceBtn" data-device-mode="auto" type="button" onclick="setDeviceMode('auto')">🔄 تلقائي</button>
     </div>
 
-    <div id="employeeLoading" class="card loading" style="min-height:120px">
-      <div><div class="spinner"></div><p>جاري تحميل بياناتك...</p></div>
-    </div>
-
-    <div id="employeeContent" class="hidden">
-      <div class="empProfileCard">
-        <div class="empAvatar" id="empAvatar">؟</div>
-        <div class="empProfileInfo">
-          <b id="selfName">—</b>
-          <span>الكود: <b id="selfCode" style="display:inline;font-size:12px">—</b></span>
-        </div>
       </div>
 
       <div class="miniKpis employeeTypeKpis" style="margin-top:10px">
